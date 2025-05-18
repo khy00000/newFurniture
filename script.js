@@ -178,3 +178,42 @@ function animate() {
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
+
+// h2 스피릿 타입
+const introSection = document.querySelector(".intro");
+const archiveSection = document.querySelector(".archive");
+const outroSection = document.querySelector(".outro");
+
+const splitText = new SplitType(".outro h2", {
+  types: "lines",
+  lineClass: "line",
+});
+
+splitText.lines.forEach((line) => {
+  const text = line.innerHTML;
+  line.innerHTML = `<span style="display: block; transform: translateY(70px);">${text}</span>`;
+});
+
+ScrollTrigger.create({
+  trigger: ".outro",
+  start: "top center",
+  onEnter: () => {
+    gsap.to(".outro-copy h2 .line span", {
+      translateY: 0,
+      dutation: 1,
+      stagger: 0.1,
+      ease: "power3.out",
+      force3D: true,
+    });
+  },
+  onLeaveBack: () => {
+    gsap.to(".outro-copy h2 .line span", {
+      translateY: 70,
+      dutation: 1,
+      stagger: 0.1,
+      ease: "power3.out",
+      force3D: true,
+    });
+  },
+  toggleActions: "play reverse play reverse",
+});
