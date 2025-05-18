@@ -45,6 +45,64 @@ renderer.shadowMap.type = THREE.PCFSoftShadow;
 renderer.physicallyCorrectLights = true;
 // ACES필름 톤매핑 색상 표현 개선
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-// 톤매핑 노출값 설정 밝기 조절
+// 톤매핑 노출값 설정(밝기 조절)
 renderer.toneMappingExposure = 2.5;
+// 컨테이너에 추가
 document.querySelector("model").appendChild(renderer.domElement);
+
+// 조명 1 / 주변광(전체 조명을 제공)
+const ambiemtlight = new THREE.Ambiemtlight(0xffffff, 0.75);
+scene.add(ambiemtlight);
+
+// 조명 2
+const mainLight = new THREE.DirectionalLight(0xffffff, 7.5);
+mainLight.position(0.5, 7.5, 2.5);
+scene.add(mainLight);
+
+// 조명 2-2
+const fillLight = new THREE.DirectionalLight(0xffffff, 2.5);
+fillLight.position.set(-15, 0, -5);
+scene.add(fillLight);
+
+// 조명 3 / 반구형 조명(상단과 하단에 자연스러운 그라데이션)
+const hemilight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.5);
+hemilight.position.set(0, 0, 0);
+scene.add(hemilight);
+
+function basicAnimate() {
+    renderer.render(scene, camera);
+    requestAnimationFrame(basicAnimate);
+}
+basicAnimate();
+
+let model;
+const loader = new THREE.GLTFLoader();
+loader.load("./assets/black_chiar.glb", function (gltf) {
+    model = gltf.scene;
+    model.traverse((node) => {
+        if (node.isMesh){
+            if (node.material){
+                // 반짝이는 표면 속성 지정
+                // 금속성
+                node.material.metalness = 2;
+                // 거칠기
+                node.material.roughness = 3;
+                // 강도(환경 조명이 표면에 얼마나 반사되는지 조정)
+                node.material.envMapintensity = 5;
+            }
+            // 그림자(더욱 사실적인 효과 넣기)
+            node.cashShadow = true;
+            node.receiveShadow = true;
+        }
+    });
+
+    //모델 치수
+    const box = new THREE.Box3().setFromObject(model);
+    //모델 가운데 위치
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+    scene.add(model);
+
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math,
+})
